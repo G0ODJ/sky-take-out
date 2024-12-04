@@ -78,7 +78,7 @@ public class EmployeeController {
 
 
     /*
-    * 新增员工接口*/
+     * 新增员工接口*/
     @PostMapping
     @ApiOperation(value = "新增员工接口")
     public Result<String> register(@RequestBody EmployeeDTO employeeDTO) {
@@ -88,7 +88,7 @@ public class EmployeeController {
     }
 
     /*
-    * 员工分页查询*/
+     * 员工分页查询*/
     @GetMapping("/page")
     @ApiOperation(value = "员工分页查询")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
@@ -98,14 +98,37 @@ public class EmployeeController {
 
     /**
      * 状态启用和禁用
+     *
      * @param status
      * @param id
      */
     @PostMapping("/status/{status}")
     @ApiOperation(value = "用户状态更新")
-    public Result startOrStop(@PathVariable("status") Integer status,Long id) {
-        log.info("id{}状态变更",id);
-        employeeService.startOrStop(status,id);
+    public Result startOrStop(@PathVariable("status") Integer status, Long id) {
+        log.info("id{}状态变更", id);
+        employeeService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    /**
+     * 根据员工id查询员工信息
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation(value = "根据id查询员工信息")
+    public Result<Employee> getById(@PathVariable Long id) {
+        log.info("查询用户id：{}", id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    @PutMapping
+    @ApiOperation(value = "更改用户信息")
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("更改的用户信息为：{}", employeeDTO);
+        employeeService.update(employeeDTO);
         return Result.success();
     }
 
