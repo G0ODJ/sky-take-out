@@ -57,4 +57,19 @@ public class CategoryController {
         return Result.success();
     }
 
+    @DeleteMapping
+    @ApiOperation(value = "根据id删除菜品分类")
+    public Result deleteById(Long id) {
+        log.info("删除id为{}的菜品",id);
+        categoryService.deleteById(id);
+        return Result.success();
+    }
+
+    @PutMapping
+    @ApiOperation(value = "修改菜品信息")
+    public Result update(CategoryDTO categoryDTO) {
+        categoryService.update(categoryDTO);
+        return Result.success();
+    }
+
 }
