@@ -11,3 +11,8 @@ sky:
     access-key-id: LTAI5tCehPswKCs6cEWQVfvR
     access-key-secret: Yc4Y9tq5EsLSdptzXlaeND5DHMtn0b
     bucket-name: sky-take-out-jackson-firsttime
+  redis:
+    host: localhost
+    port: 6379
+    password: 12345678
+    database: 1

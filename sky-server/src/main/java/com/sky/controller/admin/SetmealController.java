@@ -6,6 +6,7 @@ import com.sky.entity.Setmeal;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/admin/setmeal")
+@Api(tags = "套餐管理相关接口")
 public class SetmealController {
     @Autowired
     private SetmealService setmealService;

@@ -33,6 +33,7 @@ public class DishController {
      * @return
      */
     @PostMapping
+    @ApiOperation(value = "增加菜品")
     public Result addDish(@RequestBody DishDTO dishDTO) {
         log.info("添加菜品：{}",dishDTO);
         dishService.addDishWithFlavour(dishDTO);
