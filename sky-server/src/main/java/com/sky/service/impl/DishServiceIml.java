@@ -9,7 +9,7 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.exception.DeletionNotAllowedException;
-import com.sky.mapper.DishFlavourMapper;
+import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
@@ -30,7 +30,7 @@ public class DishServiceIml implements DishService {
     @Autowired
     private DishMapper dishMapper;
     @Autowired
-    private DishFlavourMapper dishFlavourMapper;
+    private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
 
@@ -56,7 +56,7 @@ public class DishServiceIml implements DishService {
                 flavor.setDishId(id);
             }
             // 批量插入
-            dishFlavourMapper.insertBatch(flavors);
+            dishFlavorMapper.insertBatch(flavors);
         }
     }
 
@@ -99,7 +99,7 @@ public class DishServiceIml implements DishService {
     @Override
     public DishVO getDishById(Long id) {
         Dish dish = dishMapper.getDishById(id);
-        List<DishFlavor> flavors = dishFlavourMapper.getFlavorsByDishId(id);
+        List<DishFlavor> flavors = dishFlavorMapper.getFlavorsByDishId(id);
         DishVO dishVO = new DishVO();
         BeanUtils.copyProperties(dish, dishVO);
         dishVO.setFlavors(flavors);
@@ -127,7 +127,7 @@ public class DishServiceIml implements DishService {
         // 先删除关联的菜品口味信息
         List<Long> ids = new ArrayList<>();
         ids.add(dish.getId());
-        dishFlavourMapper.deleteByDishIds(ids);
+        dishFlavorMapper.deleteByDishIds(ids);
         // 再添加新的口味信息
         List<DishFlavor> flavors = dishDTO.getFlavors();
         // 对集合操作，首先判断是否有值
@@ -135,7 +135,7 @@ public class DishServiceIml implements DishService {
             for (DishFlavor flavor : flavors) {
                 flavor.setDishId(dish.getId());
             }
-            dishFlavourMapper.insertBatch(flavors);
+            dishFlavorMapper.insertBatch(flavors);
         }
 
 
@@ -158,6 +158,31 @@ public class DishServiceIml implements DishService {
         }
 
         dishMapper.deleteDishBatch(ids);
-        dishFlavourMapper.deleteByDishIds(ids);// 关联菜品的口味也要删除
+        dishFlavorMapper.deleteByDishIds(ids);// 关联菜品的口味也要删除
     }
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getFlavorsByDishId(d.getId());
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
+    }
+
 }
