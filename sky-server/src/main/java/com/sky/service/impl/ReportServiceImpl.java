@@ -1,9 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,53 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private UserMapper userMapper;
 
+
+    /**
+     * 统计指定时间内的订单额
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public OrderReportVO ordersStatistics(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = getDateList(begin, end);
+
+        List<Integer> orderCountList = new ArrayList<>();
+        List<Integer> validOrderCountList = new ArrayList<>();
+        Integer totalOrderCount = 0;
+        Integer totalValidOrderCount = 0;
+        for (LocalDate date : dateList) {
+            // select sum(amount) from orders where order_time > ... and order_time < ... and status = 5
+            LocalDateTime begintime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endtime = LocalDateTime.of(date, LocalTime.MAX);
+            Map map = new HashMap();
+            map.put("begin", begintime);
+            map.put("end", endtime);
+            Integer orderCount = orderMapper.countByMap(map);
+            orderCount = orderCount == null ? 0 : orderCount;
+            orderCountList.add(orderCount);
+            totalOrderCount += orderCount;
+
+            map.put("status", Orders.COMPLETED);
+            Integer validOrderCount = orderMapper.countByMap(map);
+            validOrderCount = validOrderCount == null ? 0 : validOrderCount;
+            validOrderCountList.add(validOrderCount);
+            totalValidOrderCount += validOrderCount;
+        }
+        Double orderCompletionRate = 0.0;
+        if(totalOrderCount > 0){
+            orderCompletionRate = (double)totalOrderCount/totalOrderCount;
+        }
+
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dateList,","))
+                .orderCountList(StringUtils.join(orderCountList,","))
+                .validOrderCountList(StringUtils.join(validOrderCountList,","))
+                .totalOrderCount(totalOrderCount)
+                .validOrderCount(totalValidOrderCount)
+                .orderCompletionRate(orderCompletionRate)
+                .build();
+    }
 
     /**
      * 统计指定时间内的营业额
@@ -97,6 +147,31 @@ public class ReportServiceImpl implements ReportService {
                 .dateList(StringUtils.join(dateList,","))
                 .newUserList(StringUtils.join(newUserList,","))
                 .totalUserList(StringUtils.join(totalUserList,",")).build();
+    }
+
+    /**
+     * 统计销量前10
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public SalesTop10ReportVO salesTop10ReportVOStatistics(LocalDate begin, LocalDate end) {
+        LocalDateTime begintime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endtime = LocalDateTime.of(end, LocalTime.MAX);
+        List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(begintime, endtime);
+
+        List<String> nameList = new ArrayList<>();
+        List<Integer> numberList = new ArrayList<>();
+        for (GoodsSalesDTO goodsSalesDTO : salesTop10) {
+            nameList.add(goodsSalesDTO.getName());
+            numberList.add(goodsSalesDTO.getNumber());
+        }
+
+        return SalesTop10ReportVO.builder()
+                .nameList(StringUtils.join(nameList,","))
+                .numberList(StringUtils.join(numberList,","))
+                .build();
     }
 
     public List<LocalDate> getDateList(LocalDate begin, LocalDate end){
