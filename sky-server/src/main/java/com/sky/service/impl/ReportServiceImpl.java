@@ -129,13 +129,13 @@ public class ReportServiceImpl implements ReportService {
             Map map = new HashMap();
 
             map.put("end", endtime);
-            Integer totalUser = userMapper.sumByDate(map);
+            Integer totalUser = userMapper.countByMap(map);
             // 全部用户非空判断
             totalUser = totalUser == null ? 0 : totalUser;
             totalUserList.add(totalUser);
 
             map.put("begin", begintime);
-            Integer newUser = userMapper.sumByDate(map);
+            Integer newUser = userMapper.countByMap(map);
             // 新增用户非空判断
             newUser = newUser == null ? 0 : newUser;
             newUserList.add(newUser);

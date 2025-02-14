@@ -19,5 +19,5 @@ public interface UserMapper {
     @Select("select * from user where id = #{id}")
     User getById(Long id);
 
-    Integer sumByDate(Map map);
+    Integer countByMap(Map map);
 }
