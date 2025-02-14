@@ -5,6 +5,9 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
+import java.util.Map;
+
 @Mapper
 public interface UserMapper {
 
@@ -12,4 +15,9 @@ public interface UserMapper {
     public User getUserByOpenid(String openid);
 
     public void insertUser(User user);
+
+    @Select("select * from user where id = #{id}")
+    User getById(Long id);
+
+    Integer sumByDate(Map map);
 }
